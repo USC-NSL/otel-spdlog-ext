@@ -9,6 +9,11 @@
 #include <opentelemetry/trace/semantic_conventions.h>
 #include <opentelemetry/version.h>
 
+#include <opentelemetry/context/runtime_context.h>
+#include <opentelemetry/trace/context.h>
+#include <opentelemetry/trace/span_id.h>
+#include <opentelemetry/trace/trace_id.h>
+
 namespace spdlog
 {
 namespace sinks
@@ -36,6 +41,25 @@ void OpenTelemetrySink<Mutex>::sink_it_(const spdlog::details::log_msg &msg)
       log_record->SetAttribute(kCodeLineno, msg.source.line);
     }
     log_record->SetAttribute(kThreadId, msg.thread_id);
+
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto span = opentelemetry::trace::GetSpan(current_ctx);
+    if (span && span->GetContext().IsValid()) {
+      auto span_context = span->GetContext();
+      
+      auto trace_id = span_context.trace_id();
+      char trace_id_buf[opentelemetry::trace::TraceId::kSize * 2];
+      trace_id.ToLowerBase16(trace_id_buf);
+      log_record->SetTraceId(trace_id);
+      
+      auto span_id = span_context.span_id();
+      char span_id_buf[opentelemetry::trace::SpanId::kSize * 2];
+      span_id.ToLowerBase16(span_id_buf);
+      log_record->SetSpanId(span_id);
+      
+      log_record->SetTraceFlags(span_context.trace_flags());
+    }
+
     logger->EmitLogRecord(std::move(log_record));
   }
 }
