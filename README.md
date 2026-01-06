@@ -3,9 +3,18 @@
 [![FOSSA License Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-cpp-contrib.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-cpp-contrib?ref=badge_shield&issueType=license)
 [![FOSSA Security Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-cpp-contrib.svg?type=shield&issueType=security)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-cpp-contrib?ref=badge_shield&issueType=security)
 
+> Note: this is a fork of the official repo.
+
 This repository contains set of components extending functionality of the
 OpenTelemetry SDK. Instrumentation libraries, exporters, and other components
 can find their home here.
+
+## About this Fork
+This fork is mainly to fix a critical issue in trace and log correlation when using visualization infrastructure like Grafana Tempo with Grafana Loki.
+
+There are multiple components in this repo and this fork only modifies `spdlog`-related components. All other components are untouched.
+
+For the `spdlog` component, this fork automatically injects span id and trace id upon logging. This enables certain infrastructure (e.g., Grafana Tempo and Loki) to correlate logs with the corresponding traces.
 
 ## Contributing
 
